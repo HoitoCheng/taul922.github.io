@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,52 +7,33 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
-    background: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Segoe UI", sans-serif;
+    background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     display: flex; justify-content: center; align-items: flex-start;
-    min-height: 100vh; padding: 10px;
+    min-height: 100vh; padding: 8px;
   }
-  .clock {
-    width: 100%; max-width: 320px;
-    background: #ffffff;
-    border: 1px solid #f1f1f1;
-    border-radius: 18px;
-    padding: 24px 16px 18px;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
-    text-align: center;
-  }
+  .clock { text-align: center; width: 100%; max-width: 280px; padding-top: 10px; }
+  .bunny { font-size: 44px; margin-bottom: 6px; }
   .time {
-    font-size: 46px; font-weight: 700; color: #222;
-    letter-spacing: 3px; font-variant-numeric: tabular-nums;
-    line-height: 1.1;
+    font-size: 42px; font-weight: 800; color: #111;
+    letter-spacing: 2px; font-variant-numeric: tabular-nums; line-height: 1.1;
   }
-  .time .sec { font-size: 22px; color: #ffd93b; font-weight: 700; }
-  .date {
-    margin-top: 8px; font-size: 13px; color: #999; letter-spacing: 2px;
-  }
-  .greet {
-    margin-top: 10px; font-size: 11px; color: #ccc; letter-spacing: 3px;
-  }
+  .date { margin-top: 8px; font-size: 13px; color: #888; letter-spacing: 1px; }
 </style>
 </head>
 <body>
 <div class="clock">
-  <div class="time"><span id="hm">--:--</span><span class="sec" id="sec">--</span></div>
+  <div class="bunny">🐰</div>
+  <div class="time" id="time">--:--:--</div>
   <div class="date" id="date"></div>
-  <div class="greet" id="greet"></div>
 </div>
 <script>
-  const week = ['日','一','二','三','四','五','六'];
+  const week = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   function tick() {
-    const n = new Date();
-    const p = x => String(x).padStart(2, '0');
-    document.getElementById('hm').textContent = p(n.getHours()) + ':' + p(n.getMinutes());
-    document.getElementById('sec').textContent = ' ' + p(n.getSeconds());
-    document.getElementById('date').textContent =
-      (n.getMonth() + 1) + '月' + n.getDate() + '日 星期' + week[n.getDay()];
-    const h = n.getHours();
-    const g = h < 6 ? '夜深了' : h < 12 ? '上午好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
-    document.getElementById('greet').textContent = g;
+    const n = new Date(), p = x => String(x).padStart(2, '0');
+    document.getElementById('time').textContent = p(n.getHours()) + ':' + p(n.getMinutes()) + ':' + p(n.getSeconds());
+    document.getElementById('date').textContent = week[n.getDay()] + ', ' + months[n.getMonth()] + ' ' + n.getDate();
   }
   tick(); setInterval(tick, 1000);
 </script>
