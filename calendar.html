@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,107 +7,87 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
-    background: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Segoe UI", sans-serif;
+    background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     display: flex; justify-content: center; align-items: flex-start;
-    min-height: 100vh; padding: 10px;
+    min-height: 100vh; padding: 8px;
   }
-  .cal {
-    width: 100%; max-width: 320px;
-    background: #ffffff;
-    border: 1px solid #f1f1f1;
-    border-radius: 18px;
-    padding: 18px 16px 12px;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
-  }
+  .cal { width: 100%; max-width: 300px; }
   .header {
+    background: #111; color: #fff;
+    border-radius: 12px 12px 0 0;
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px; padding: 0 4px;
+    padding: 10px 14px;
   }
-  .title { font-size: 18px; font-weight: 700; color: #222; letter-spacing: 1px; }
-  .title .year { font-weight: 400; color: #aaa; font-size: 13px; margin-left: 8px; letter-spacing: 0; }
-  .nav { display: flex; gap: 8px; }
-  .nav button {
-    width: 30px; height: 30px; border-radius: 50%;
-    border: none; background: #f7f7f7;
-    color: #999; font-size: 15px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s;
+  .header .title { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; }
+  .header .nav { display: flex; gap: 4px; }
+  .header .nav button {
+    border: none; background: transparent; color: #fff;
+    font-size: 14px; cursor: pointer; padding: 2px 8px; border-radius: 6px;
   }
-  .nav button:hover { background: #ffef9e; color: #555; }
-  .weekdays, .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-  .weekdays { margin-bottom: 8px; }
+  .header .nav button:hover { background: rgba(255,255,255,0.15); }
+  .body {
+    background: #fff; border: 1px solid #eee; border-top: none;
+    border-radius: 0 0 12px 12px; padding: 12px 10px 10px;
+  }
+  .weekdays, .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .weekdays { margin-bottom: 6px; }
   .weekdays span {
-    text-align: center; font-size: 11px; font-weight: 600;
-    color: #bbb; padding: 4px 0;
+    text-align: center; font-size: 10px; font-weight: 700;
+    color: #999; padding: 3px 0;
   }
   .days span {
     aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-    font-size: 13.5px; color: #333; border-radius: 50%;
-    cursor: default; transition: background 0.15s;
+    font-size: 12px; color: #333; border-radius: 50%; cursor: default;
   }
   .days span.other { color: #ddd; }
   .days span.today {
-    background: #ffd93b; color: #222; font-weight: 700;
+    background: #111; color: #fff; font-weight: 700;
   }
-  .days span:not(.other):not(.today):hover { background: #fafafa; }
-  .footer {
-    margin-top: 12px; padding-top: 10px;
-    border-top: 1px solid #f5f5f5;
-    text-align: center; font-size: 10px; color: #ccc; letter-spacing: 3px;
-  }
+  .days span:not(.other):not(.today):hover { background: #f5f5f5; }
 </style>
 </head>
 <body>
 <div class="cal">
   <div class="header">
-    <div class="title"><span id="month"></span><span class="year" id="year"></span></div>
-    <div class="nav">
-      <button id="prev" aria-label="上个月">‹</button>
-      <button id="next" aria-label="下个月">›</button>
-    </div>
+    <div class="nav"><button id="prev">‹</button></div>
+    <div class="title" id="title"></div>
+    <div class="nav"><button id="next">›</button></div>
   </div>
-  <div class="weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
-  <div class="days" id="days"></div>
-  <div class="footer">HAVE A NICE DAY</div>
+  <div class="body">
+    <div class="weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+    <div class="days" id="days"></div>
+  </div>
 </div>
 <script>
-  const monthEl = document.getElementById('month');
-  const yearEl = document.getElementById('year');
+  const titleEl = document.getElementById('title');
   const daysEl = document.getElementById('days');
-  const monthNames = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const now = new Date();
-  let viewY = now.getFullYear(), viewM = now.getMonth();
-
+  let vy = now.getFullYear(), vm = now.getMonth();
   function render() {
-    monthEl.textContent = monthNames[viewM];
-    yearEl.textContent = viewY;
+    titleEl.textContent = months[vm] + ' ' + vy;
     daysEl.innerHTML = '';
-    const first = new Date(viewY, viewM, 1).getDay();
-    const dim = new Date(viewY, viewM + 1, 0).getDate();
-    const prevDim = new Date(viewY, viewM, 0).getDate();
+    const first = new Date(vy, vm, 1).getDay();
+    const dim = new Date(vy, vm + 1, 0).getDate();
+    const pdim = new Date(vy, vm, 0).getDate();
     for (let i = first - 1; i >= 0; i--) {
-      const s = document.createElement('span');
-      s.className = 'other'; s.textContent = prevDim - i;
+      const s = document.createElement('span'); s.className = 'other'; s.textContent = pdim - i;
       daysEl.appendChild(s);
     }
     for (let d = 1; d <= dim; d++) {
-      const s = document.createElement('span');
-      s.textContent = d;
-      if (d === now.getDate() && viewM === now.getMonth() && viewY === now.getFullYear())
-        s.className = 'today';
+      const s = document.createElement('span'); s.textContent = d;
+      if (d === now.getDate() && vm === now.getMonth() && vy === now.getFullYear()) s.className = 'today';
       daysEl.appendChild(s);
     }
-    const total = first + dim;
-    const tail = (7 - total % 7) % 7;
+    const tail = (7 - (first + dim) % 7) % 7;
     for (let d = 1; d <= tail; d++) {
-      const s = document.createElement('span');
-      s.className = 'other'; s.textContent = d;
+      const s = document.createElement('span'); s.className = 'other'; s.textContent = d;
       daysEl.appendChild(s);
     }
   }
-  document.getElementById('prev').onclick = () => { viewM--; if (viewM < 0) { viewM = 11; viewY--; } render(); };
-  document.getElementById('next').onclick = () => { viewM++; if (viewM > 11) { viewM = 0; viewY++; } render(); };
+  document.getElementById('prev').onclick = () => { vm--; if (vm < 0) { vm = 11; vy--; } render(); };
+  document.getElementById('next').onclick = () => { vm++; if (vm > 11) { vm = 0; vy++; } render(); };
   render();
 </script>
 </body>
