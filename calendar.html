@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #fffdf8;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Segoe UI", sans-serif;
+    display: flex; justify-content: center; align-items: flex-start;
+    min-height: 100vh; padding: 12px;
+  }
+  .cal {
+    width: 100%; max-width: 340px;
+    background: #fffdf8;
+    border: 1.5px solid #f0e6d8;
+    border-radius: 20px;
+    padding: 18px 16px 14px;
+    box-shadow: 0 2px 12px rgba(180, 140, 100, 0.08);
+  }
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px; padding: 0 4px;
+  }
+  .title { font-size: 17px; font-weight: 700; color: #5b4a3a; letter-spacing: 0.5px; }
+  .title .year { font-weight: 400; color: #b09a80; font-size: 13px; margin-left: 6px; }
+  .nav { display: flex; gap: 6px; }
+  .nav button {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1.5px solid #f0e6d8; background: #fff;
+    color: #b09a80; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .nav button:hover { background: #fdf3e3; border-color: #e8d5b8; color: #8a6f52; }
+  .weekdays, .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .weekdays { margin-bottom: 6px; }
+  .weekdays span {
+    text-align: center; font-size: 11px; font-weight: 600;
+    color: #c4a882; padding: 4px 0; letter-spacing: 1px;
+  }
+  .days span {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #6b5a48; border-radius: 50%;
+    cursor: default; transition: background 0.15s;
+  }
+  .days span.other { color: #d8c9b4; }
+  .days span.today {
+    background: #f5b942; color: #fff; font-weight: 700;
+    box-shadow: 0 2px 8px rgba(245, 185, 66, 0.4);
+  }
+  .days span:not(.other):not(.today):hover { background: #fdf3e3; }
+  .footer {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px dashed #f0e6d8;
+    text-align: center; font-size: 11px; color: #c4a882; letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="cal">
+  <div class="header">
+    <div class="title"><span id="month"></span><span class="year" id="year"></span></div>
+    <div class="nav">
+      <button id="prev" aria-label="上个月">‹</button>
+      <button id="next" aria-label="下个月">›</button>
+    </div>
+  </div>
+  <div class="weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+  <div class="days" id="days"></div>
+  <div class="footer">✿ HAVE A NICE DAY ✿</div>
+</div>
+<script>
+  const monthEl = document.getElementById('month');
+  const yearEl = document.getElementById('year');
+  const daysEl = document.getElementById('days');
+  const monthNames = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  const now = new Date();
+  let viewY = now.getFullYear(), viewM = now.getMonth();
+
+  function render() {
+    monthEl.textContent = monthNames[viewM];
+    yearEl.textContent = viewY;
+    daysEl.innerHTML = '';
+    const first = new Date(viewY, viewM, 1).getDay();
+    const dim = new Date(viewY, viewM + 1, 0).getDate();
+    const prevDim = new Date(viewY, viewM, 0).getDate();
+    for (let i = first - 1; i >= 0; i--) {
+      const s = document.createElement('span');
+      s.className = 'other'; s.textContent = prevDim - i;
+      daysEl.appendChild(s);
+    }
+    for (let d = 1; d <= dim; d++) {
+      const s = document.createElement('span');
+      s.textContent = d;
+      if (d === now.getDate() && viewM === now.getMonth() && viewY === now.getFullYear())
+        s.className = 'today';
+      daysEl.appendChild(s);
+    }
+    const total = first + dim;
+    const tail = (7 - total % 7) % 7;
+    for (let d = 1; d <= tail; d++) {
+      const s = document.createElement('span');
+      s.className = 'other'; s.textContent = d;
+      daysEl.appendChild(s);
+    }
+  }
+  document.getElementById('prev').onclick = () => { viewM--; if (viewM < 0) { viewM = 11; viewY--; } render(); };
+  document.getElementById('next').onclick = () => { viewM++; if (viewM > 11) { viewM = 0; viewY++; } render(); };
+  render();
+</script>
+</body>
+</html>
