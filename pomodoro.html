@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,65 +7,53 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
-    background: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Segoe UI", sans-serif;
+    background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     display: flex; justify-content: center; align-items: flex-start;
-    min-height: 100vh; padding: 10px;
+    min-height: 100vh; padding: 8px;
   }
-  .pomo {
-    width: 100%; max-width: 320px;
-    background: #ffffff;
-    border: 1px solid #f1f1f1;
-    border-radius: 18px;
-    padding: 20px 16px 16px;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
-    text-align: center;
-  }
-  .modes { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; }
+  .pomo { text-align: center; width: 100%; max-width: 280px; }
+  .modes { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
   .modes button {
-    border: none; background: #f7f7f7; color: #999;
-    font-size: 12px; font-weight: 600; padding: 7px 12px;
+    border: 1.5px solid #222; background: transparent; color: #222;
+    font-size: 11px; font-weight: 600; padding: 6px 14px;
     border-radius: 20px; cursor: pointer; transition: all 0.15s;
     font-family: inherit;
   }
-  .modes button.active { background: #ffd93b; color: #222; }
-  .modes button:not(.active):hover { background: #eee; }
+  .modes button.active { background: #222; color: #fff; }
   .time {
-    font-size: 52px; font-weight: 700; color: #222;
-    letter-spacing: 2px; margin: 8px 0 4px;
-    font-variant-numeric: tabular-nums;
+    font-size: 64px; font-weight: 800; color: #111;
+    letter-spacing: 1px; font-variant-numeric: tabular-nums;
+    line-height: 1; margin-bottom: 20px;
   }
-  .label { font-size: 11px; color: #ccc; letter-spacing: 3px; margin-bottom: 14px; }
-  .controls { display: flex; gap: 8px; justify-content: center; }
-  .controls button {
-    border: none; cursor: pointer; font-family: inherit;
-    font-size: 13px; font-weight: 600; border-radius: 20px;
-    padding: 9px 22px; transition: all 0.15s;
+  .controls { display: flex; gap: 10px; justify-content: center; align-items: center; }
+  #startBtn {
+    border: none; background: #111; color: #fff;
+    font-size: 14px; font-weight: 600; padding: 10px 32px;
+    border-radius: 24px; cursor: pointer; font-family: inherit;
+    transition: background 0.15s;
   }
-  #startBtn { background: #222; color: #fff; }
-  #startBtn:hover { background: #444; }
-  #resetBtn { background: #f7f7f7; color: #999; }
-  #resetBtn:hover { background: #eee; color: #666; }
-  .dots { display: flex; gap: 6px; justify-content: center; margin-top: 12px; }
-  .dots span {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #eee; transition: background 0.2s;
+  #startBtn:hover { background: #333; }
+  .icon-btn {
+    border: none; background: transparent; cursor: pointer;
+    font-size: 20px; color: #111; padding: 6px;
   }
-  .dots span.done { background: #ffd93b; }
+  .dots { display: flex; gap: 6px; justify-content: center; margin-top: 16px; }
+  .dots span { width: 7px; height: 7px; border-radius: 50%; background: #e0e0e0; }
+  .dots span.done { background: #111; }
 </style>
 </head>
 <body>
 <div class="pomo">
   <div class="modes">
-    <button data-min="25" class="active">专注</button>
-    <button data-min="5">休息</button>
-    <button data-min="15">长休</button>
+    <button data-min="25" class="active">Pomodoro</button>
+    <button data-min="5">Short Break</button>
+    <button data-min="15">Long Break</button>
   </div>
   <div class="time" id="time">25:00</div>
-  <div class="label">POMODORO</div>
   <div class="controls">
-    <button id="startBtn">开始</button>
-    <button id="resetBtn">重置</button>
+    <button id="startBtn">Start</button>
+    <button class="icon-btn" id="resetBtn" title="Reset">↻</button>
   </div>
   <div class="dots" id="dots"><span></span><span></span><span></span><span></span></div>
 </div>
@@ -76,31 +64,22 @@
   const modeBtns = document.querySelectorAll('.modes button');
   const dots = document.querySelectorAll('#dots span');
   let totalSec = 25 * 60, remain = totalSec, timer = null, running = false, completed = 0;
-
-  function fmt(s) {
-    return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
-  }
-  function draw() { timeEl.textContent = fmt(remain); }
-  function stop() { clearInterval(timer); timer = null; running = false; startBtn.textContent = '开始'; }
-
+  const fmt = s => String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+  const draw = () => timeEl.textContent = fmt(remain);
+  function stop() { clearInterval(timer); timer = null; running = false; startBtn.textContent = 'Start'; }
   modeBtns.forEach(b => b.onclick = () => {
     modeBtns.forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    stop();
-    totalSec = remain = parseInt(b.dataset.min) * 60;
-    draw();
+    b.classList.add('active'); stop();
+    totalSec = remain = parseInt(b.dataset.min) * 60; draw();
   });
   startBtn.onclick = () => {
     if (running) { stop(); return; }
-    running = true; startBtn.textContent = '暂停';
+    running = true; startBtn.textContent = 'Pause';
     timer = setInterval(() => {
-      remain--;
-      if (remain <= 0) {
+      if (--remain <= 0) {
         stop(); remain = totalSec; draw();
-        completed = (completed + 1) % 4;
-        dots.forEach((d, i) => d.classList.toggle('done', i < completed || completed === 0 && false));
-        if (completed === 0) dots.forEach(d => d.classList.remove('done'));
-        else dots[completed - 1].classList.add('done');
+        completed = (completed + 1) % 5;
+        dots.forEach((d, i) => d.classList.toggle('done', i < completed));
         return;
       }
       draw();
